@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart School Management System</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --success: #27ae60;
+            --danger: #c0392b;
+            --light: #ecf0f1;
+            --white: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body { display: flex; height: 100vh; background-color: #f4f7f6; }
+
+        /* Sidebar */
+        aside {
+            width: 250px;
+            background-color: var(--primary);
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            transition: 0.3s;
+        }
+
+        aside h2 { margin-bottom: 30px; text-align: center; font-size: 1.5rem; border-bottom: 1px solid var(--secondary); padding-bottom: 15px; }
+        
+        nav button {
+            background: none;
+            border: none;
+            color: var(--light);
+            width: 100%;
+            padding: 15px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+
+        nav button:hover, nav button.active { background-color: var(--accent); color: white; }
+
+        /* Main Content */
+        main { flex: 1; padding: 30px; overflow-y: auto; }
+
+        .header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header-section h1 { color: var(--primary); }
+
+        /* Cards */
+        .stats-container { display: flex; gap: 20px; margin-bottom: 30px; }
+        .stat-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            flex: 1;
+            border-left: 5px solid var(--accent);
+        }
+        .stat-card h3 { color: #7f8c8d; font-size: 0.9rem; }
+        .stat-card p { font-size: 2rem; font-weight: bold; color: var(--primary); margin-top: 10px; }
+
+        /* Tables & Forms */
+        .content-box { background: var(--white); padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: none; }
+        .content-box.active { display: block; animation: fadeIn 0.5s; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-primary { background-color: var(--accent); }
+        .btn-success { background-color: var(--success); }
+        .btn-danger { background-color: var(--danger); }
+        .btn-sm { padding: 5px 10px; font-size: 0.8rem; margin-right: 5px; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: var(--light); color: var(--primary); }
+        tr:hover { background-color: #f9f9f9; }
+
+        /* Form Styling */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: var(--secondary); }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-row { display: flex; gap: 20px; }
+        .form-row .form-group { flex: 1; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 500px;
+            position: relative;
+        }
+        .close { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 5px;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside>
+        <h2>🏫 EduManager</h2>
+        <nav>
+            <button class="active" onclick="showSection('dashboard')">Dashboard</button>
+            <button onclick="showSection('students')">Students</button>
+            <button onclick="showSection('fees')">Fee Collection</button>
+            <button onclick="showSection('teachers')">Teachers</button>
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- DASHBOARD SECTION -->
+        <div id="dashboard" class="content-box active">
+            <div class="header-section">
+                <h1>Dashboard Overview</h1>
+                <p id="date-display"></p>
+            </div>
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>Total Students</h3>
+                    <p id="total-students">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Fees Collected</h3>
+                    <p id="total-fees">$0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Teachers</h3>
+                    <p id="total-teachers">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- STUDENTS SECTION -->
+        <div id="students" class="content-box">
+            <div class="header-section">
+                <h1>Student Management</h1>
+                <button class="btn btn-primary" onclick="openModal('studentModal')">+ Add New Student</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Class</th>
+                        <th>Parent Contact</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="student-table-body">
+                    <!-- JS will populate this -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- FEES SECTION -->
+        <div id="fees" class="content-box">
+            <div class="header-section">
+                <h1>Fee Collection</h1>
+                <button class="btn btn-success" onclick="openModal('feeModal')">+ Collect Fee</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Reciept #</th>
+                        <th>Student Name</th>
+                        <th>Amount</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="fee-table-body">
+                    <!-- JS will populate this -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- TEACHERS SECTION (Placeholder) -->
+        <div id="teachers" class="content-box">
+             <div class="header-section">
+                <h1>Teacher Directory</h1>
+                <button class="btn btn-primary" onclick="alert('Feature coming soon!')">+ Add Teacher</button>
+            </div>
+            <p style="text-align:center; color:#777; margin-top:20px;">Teacher management module under development.</p>
+        </div>
+
+    </main>
+
+    <!-- MODALS -->
+    <!-- Add Student Modal -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('studentModal')">&times;</span>
+            <h2>Add Student</h2>
+            <form id="studentForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="sName" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Class</label>
+                        <select id="sClass">
+                            <option>Grade 10</option>
+                            <option>Grade 11</option>
+                            <option>Grade 12</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Roll Number</label>
+                        <input type="number" id="sRoll" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Parent Phone</label>
+                    <input type="tel" id="sPhone" required>
+                </div>
+                <button type="submit" class="btn btn-success" style="width:100%">Save Student</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Collect Fee Modal -->
+    <div id="feeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('feeModal')">&times;</span>
+            <h2>Collect Fee</h2>
+            <form id="feeForm">
+                <div class="form-group">
+                    <label>Select Student</label>
+                    <select id="fStudentSelect" required>
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="fAmount" required>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="fDate" required>
+                </div>
+                <button type="submit" class="btn btn-success" style="width:100%">Submit Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="notification">Operation Successful!</div>
+
+    <script>
+        // --- DATA MANAGEMENT (Using LocalStorage) ---
+        let students = JSON.parse(localStorage.getItem('sms_students')) || [
+            { id: 101, name: 'Avishek Kumar', class: 'Grade 10', roll: 12, phone: '9631044795' },
+            { id: 102, name: 'Rahul Sharma', class: 'Grade 11', roll: 05, phone: '9876543210' }
+        ];
+
+        let fees = JSON.parse(localStorage.getItem('sms_fees')) || [];
+
+        // Save to LocalStorage Helper
+        function saveData() {
+            localStorage.setItem('sms_students', JSON.stringify(students));
+            localStorage.setItem('sms_fees', JSON.stringify(fees));
+            renderApp();
+        }
+
+        // --- UI LOGIC ---
+
+        function showSection(id) {
+            // Hide all sections
+            document.querySelectorAll('.content-box').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+            
+            // Show selected
+            document.getElementById(id).classList.add('active');
+            
+            // Highlight button (Simple loop to find matching button)
+            const buttons = document.querySelectorAll('nav button');
+            if(id === 'dashboard') buttons[0].classList.add('active');
+            if(id === 'students') buttons[1].classList.add('active');
+            if(id === 'fees') buttons[2].classList.add('active');
+            if(id === 'teachers') buttons[3].classList.add('active');
+        }
+
+        function openModal(id) {
+            document.getElementById(id).style.display = 'flex';
+            if(id === 'feeModal') populateFeeDropdown();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        // --- CORE FUNCTIONS ---
+
+        function renderApp() {
+            // 1. Render Dashboard Stats
+            document.getElementById('total-students').innerText = students.length;
+            document.getElementById('total-teachers').innerText = "5"; // Dummy data
+            const totalFees = fees.reduce((sum, item) => sum + parseInt(item.amount), 0);
+            document.getElementById('total-fees').innerText = "$" + totalFees;
+            document.getElementById('date-display').innerText = new Date().toDateString();
+
+            // 2. Render Student Table
+            const sTable = document.getElementById('student-table-body');
+            sTable.innerHTML = '';
+            students.forEach(s => {
+                const row = `
+                    <tr>
+                        <td>${s.id}</td>
+                        <td>${s.name}</td>
+                        <td>${s.class}</td>
+                        <td>${s.phone}</td>
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="deleteStudent(${s.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+                sTable.innerHTML += row;
+            });
+
+            // 3. Render Fee Table
+            const fTable = document.getElementById('fee-table-body');
+            fTable.innerHTML = '';
+            fees.forEach((f, index) => {
+                const row = `
+                    <tr>
+                        <td>#00${index + 1}</td>
+                        <td>${f.studentName}</td>
+                        <td>$${f.amount}</td>
+                        <td>${f.date}</td>
+                    </tr>
+                `;
+                fTable.innerHTML += row;
+            });
+        }
+
+        // --- ADD STUDENT ---
+        document.getElementById('studentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newStudent = {
+                id: students.length > 0 ? students[students.length-1].id + 1 : 101,
+                name: document.getElementById('sName').value,
+                class: document.getElementById('sClass').value,
+                roll: document.getElementById('sRoll').value,
+                phone: document.getElementById('sPhone').value
+            };
+            students.push(newStudent);
+            saveData();
+            closeModal('studentModal');
+            this.reset();
+            showToast('Student Added Successfully');
+        });
+
+        function deleteStudent(id) {
+            if(confirm('Are you sure you want to delete this student?')) {
+                students = students.filter(s => s.id !== id);
+                saveData();
+                showToast('Student Deleted');
+            }
+        }
+
+        // --- FEE MANAGEMENT ---
+        function populateFeeDropdown() {
+            const select = document.getElementById('fStudentSelect');
+            select.innerHTML = '<option value="">Select Student...</option>';
+            students.forEach(s => {
+                select.innerHTML += `<option value="${s.name}">${s.name} (${s.class})</option>`;
+            });
+        }
+
+        document.getElementById('feeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const feeData = {
+                studentName: document.getElementById('fStudentSelect').value,
+                amount: document.getElementById('fAmount').value,
+                date: document.getElementById('fDate').value
+            };
+            fees.push(feeData);
+            saveData();
+            closeModal('feeModal');
+            this.reset();
+            showToast('Fee Payment Recorded');
+        });
+
+        // Initialize App
+        renderApp();
+
+    </script>
+</body>
+</html>
+</body>
+</html>
